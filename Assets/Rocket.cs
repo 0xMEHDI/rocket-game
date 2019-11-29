@@ -6,12 +6,14 @@ using UnityEngine.SceneManagement;
 
 public class Rocket : MonoBehaviour
 {
-    [SerializeField] float rcsThrust = 100f;
-    [SerializeField] float rcsRotate = 100f;
-
     [SerializeField] AudioClip engineSound;
     [SerializeField] AudioClip successSound;
     [SerializeField] AudioClip deathSound;
+
+    [SerializeField] ParticleSystem thrustFX;
+
+    [SerializeField] float verticalThrust = 100f;
+    [SerializeField] float horizontalThrust = 100f;
 
     [SerializeField] float levelLoadDelay = 2f;
 
@@ -35,25 +37,20 @@ public class Rocket : MonoBehaviour
     {
         if (state == State.Alive)
         {
-            RespondToThrustInput();
-            RespondToRotateInput();
+            ProcessThrust();
+            ProcessRotation();
         }
         if (Debug.isDebugBuild) 
-        { 
-            RespondToDebugKeys(); 
-        }       
+            ProcessDebugKeys();       
     }
 
-    private void RespondToDebugKeys()
+    private void ProcessDebugKeys()
     {
         if (Input.GetKeyDown(KeyCode.L))
-        {
             LoadNextLevel();
-        }
-        else if (Input.GetKeyDown(KeyCode.C))
-        {
+
+        else if (Input.GetKeyDown(KeyCode.C))           
             collisionsEnabled = !collisionsEnabled;
-        }
     }
 
     void OnCollisionEnter(Collision collision)
@@ -98,51 +95,48 @@ public class Rocket : MonoBehaviour
         int currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
         int nextSceneIndex = currentSceneIndex + 1;
         int lastSceneIndex = SceneManager.sceneCountInBuildSettings - 1;
-        if (currentSceneIndex < lastSceneIndex)
-        {
+
+        if (currentSceneIndex < lastSceneIndex) 
             SceneManager.LoadScene(nextSceneIndex);
-        } 
+
         else if (currentSceneIndex == lastSceneIndex)
-        {
             LoadFirstLevel();
-        }
     }
 
-    private void RespondToThrustInput()
+    private void ProcessThrust()
     {
         if (Input.GetKey(KeyCode.Space))
         {
-            ApplyThrust();
+            Thrust();
+            thrustFX.Play();
         }
+
         else
         {
             audioSource.Stop();
-        }
+            thrustFX.Stop();
+        }   
     }
 
-    private void ApplyThrust()
+    private void Thrust()
     {
-        float thrustThisFrame = rcsThrust * Time.deltaTime;
+        float thrustThisFrame = verticalThrust * Time.deltaTime;
         rigidBody.AddRelativeForce(Vector3.up * thrustThisFrame);
+
         if (!audioSource.isPlaying)
-        {
             audioSource.PlayOneShot(engineSound);
-        }
     }
 
-    private void RespondToRotateInput()
+    private void ProcessRotation()
     {
         rigidBody.freezeRotation = true;
-        float rotationThisFrame = rcsRotate * Time.deltaTime;
+        float rotationThisFrame = horizontalThrust * Time.deltaTime;
 
         if (Input.GetKey(KeyCode.A))
-        {
             transform.Rotate(Vector3.forward * rotationThisFrame);
-        }
+
         else if (Input.GetKey(KeyCode.D))
-        {
             transform.Rotate(Vector3.back * rotationThisFrame);
-        }
 
         rigidBody.freezeRotation = false;
     }
