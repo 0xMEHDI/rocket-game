@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
+[DisallowMultipleComponent]
 public class PlayerController : MonoBehaviour
 {
     [SerializeField] AudioClip engineSound;
@@ -22,6 +23,7 @@ public class PlayerController : MonoBehaviour
     Rigidbody rigidBody;
     AudioSource audioSource;
     MeshRenderer[] meshes;
+    Light pointLight;
 
     enum State { Alive, Dying, Transcending }
     State state = State.Alive;
@@ -33,6 +35,7 @@ public class PlayerController : MonoBehaviour
         rigidBody = GetComponent<Rigidbody>();
         audioSource = GetComponent<AudioSource>();
         meshes = GetComponentsInChildren<MeshRenderer>();
+        pointLight = GetComponentInChildren<Light>();
 
         successFX.gameObject.SetActive(false);
         deathFX.SetActive(false);
@@ -63,30 +66,30 @@ public class PlayerController : MonoBehaviour
     {
         if (state != State.Alive || !collisionsEnabled) { return; }
 
-        switch (collision.gameObject.tag)
-        {
-            case "Friendly":
-                break;
-            case "Finish":
-                StartSuccessSequence();
-                break;
-            default:
-                StartDeathSequence();
-                break;
-        }
+        if (collision.gameObject.CompareTag("Finish"))
+            StartSuccessSequence();
+
+        else if (!collision.gameObject.CompareTag("Friendly"))
+            StartDeathSequence();
     }
 
     private void StartSuccessSequence()
     {
         state = State.Transcending;
+
         audioSource.PlayOneShot(successSound);
+
         successFX.SetActive(true);
+
+        rigidBody.isKinematic = true;
+
         Invoke("LoadNextLevel", levelLoadDelay);
     }
 
     private void StartDeathSequence()
     {
         state = State.Dying;
+
         audioSource.Stop();
         audioSource.PlayOneShot(deathSound);
 
@@ -95,9 +98,12 @@ public class PlayerController : MonoBehaviour
             meshes[i].enabled = false;
         }
 
-        rigidBody.isKinematic = true;
+        pointLight.gameObject.SetActive(false);
         engineFX.gameObject.SetActive(false);
         deathFX.SetActive(true);
+
+        rigidBody.isKinematic = true;
+
         Invoke("LoadFirstLevel", levelLoadDelay);
     }
 
