@@ -4,14 +4,16 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class Rocket : MonoBehaviour
+public class PlayerController : MonoBehaviour
 {
     [SerializeField] AudioClip engineSound;
     [SerializeField] AudioClip successSound;
     [SerializeField] AudioClip deathSound;
 
-    [SerializeField] ParticleSystem thrustFX;
-
+    [SerializeField] ParticleSystem engineFX;
+    [SerializeField] ParticleSystem successFX;
+    [SerializeField] ParticleSystem deathFX;
+    
     [SerializeField] float verticalThrust = 100f;
     [SerializeField] float horizontalThrust = 100f;
 
@@ -25,14 +27,15 @@ public class Rocket : MonoBehaviour
 
     bool collisionsEnabled = true;
 
-    // Start is called before the first frame update
     void Start()
     {
         rigidBody = GetComponent<Rigidbody>();
         audioSource = GetComponent<AudioSource>();
+
+        successFX.gameObject.SetActive(false);
+        deathFX.gameObject.SetActive(false);
     }
 
-    // Update is called once per frame
     void Update()
     {
         if (state == State.Alive)
@@ -40,8 +43,9 @@ public class Rocket : MonoBehaviour
             ProcessThrust();
             ProcessRotation();
         }
+
         if (Debug.isDebugBuild) 
-            ProcessDebugKeys();       
+            ProcessDebugKeys();
     }
 
     private void ProcessDebugKeys()
@@ -74,6 +78,7 @@ public class Rocket : MonoBehaviour
     {
         state = State.Transcending;
         audioSource.PlayOneShot(successSound);
+        successFX.gameObject.SetActive(true);
         Invoke("LoadNextLevel", levelLoadDelay);
     }
 
@@ -82,6 +87,7 @@ public class Rocket : MonoBehaviour
         state = State.Dying;
         audioSource.Stop();
         audioSource.PlayOneShot(deathSound);
+        deathFX.gameObject.SetActive(true);
         Invoke("LoadFirstLevel", levelLoadDelay);
     }
 
@@ -108,13 +114,13 @@ public class Rocket : MonoBehaviour
         if (Input.GetKey(KeyCode.Space))
         {
             Thrust();
-            thrustFX.Play();
+            engineFX.gameObject.SetActive(true);
         }
-
+            
         else
         {
             audioSource.Stop();
-            thrustFX.Stop();
+            engineFX.gameObject.SetActive(false);
         }   
     }
 
