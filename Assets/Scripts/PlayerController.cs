@@ -23,6 +23,7 @@ public class PlayerController : MonoBehaviour
     Rigidbody rigidBody;
     AudioSource audioSource;
     MeshRenderer[] meshes;
+    Collider[] colliders;
     Light pointLight;
 
     enum State { Alive, Dying, Transcending }
@@ -35,6 +36,7 @@ public class PlayerController : MonoBehaviour
         rigidBody = GetComponent<Rigidbody>();
         audioSource = GetComponent<AudioSource>();
         meshes = GetComponentsInChildren<MeshRenderer>();
+        colliders = GetComponentsInChildren<Collider>();
         pointLight = GetComponentInChildren<Light>();
 
         successFX.gameObject.SetActive(false);
@@ -51,78 +53,6 @@ public class PlayerController : MonoBehaviour
 
         if (Debug.isDebugBuild) 
             ProcessDebugKeys();
-    }
-
-    private void ProcessDebugKeys()
-    {
-        if (Input.GetKeyDown(KeyCode.L))
-            LoadNextLevel();
-
-        else if (Input.GetKeyDown(KeyCode.C))           
-            collisionsEnabled = !collisionsEnabled;
-    }
-
-    void OnCollisionEnter(Collision collision)
-    {
-        if (state != State.Alive || !collisionsEnabled) { return; }
-
-        if (collision.gameObject.CompareTag("Finish"))
-            StartSuccessSequence();
-
-        else if (!collision.gameObject.CompareTag("Friendly"))
-            StartDeathSequence();
-    }
-
-    private void StartSuccessSequence()
-    {
-        state = State.Transcending;
-
-        audioSource.PlayOneShot(successSound);
-
-        successFX.SetActive(true);
-
-        rigidBody.isKinematic = true;
-
-        Invoke("LoadNextLevel", levelLoadDelay);
-    }
-
-    private void StartDeathSequence()
-    {
-        state = State.Dying;
-
-        audioSource.Stop();
-        audioSource.PlayOneShot(deathSound);
-
-        for (int i = 0; i < meshes.Length; i++)
-        {
-            meshes[i].enabled = false;
-        }
-
-        pointLight.gameObject.SetActive(false);
-        engineFX.gameObject.SetActive(false);
-        deathFX.SetActive(true);
-
-        rigidBody.isKinematic = true;
-
-        Invoke("LoadFirstLevel", levelLoadDelay);
-    }
-
-    private void LoadFirstLevel()
-    {
-        SceneManager.LoadScene(0);
-    }
-
-    private void LoadNextLevel()
-    {
-        int currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
-        int nextSceneIndex = currentSceneIndex + 1;
-        int lastSceneIndex = SceneManager.sceneCountInBuildSettings - 1;
-
-        if (currentSceneIndex < lastSceneIndex) 
-            SceneManager.LoadScene(nextSceneIndex);
-
-        else if (currentSceneIndex == lastSceneIndex)
-            LoadFirstLevel();
     }
 
     private void ProcessThrust()
@@ -161,5 +91,76 @@ public class PlayerController : MonoBehaviour
             transform.Rotate(Vector3.back * rotationThisFrame);
 
         rigidBody.freezeRotation = false;
+    }
+
+    void OnCollisionEnter(Collision collision)
+    {
+        if (state != State.Alive || !collisionsEnabled) { return; }
+
+        if (collision.gameObject.CompareTag("Finish"))
+            StartSuccessSequence();
+
+        else if (!collision.gameObject.CompareTag("Friendly"))
+            StartDeathSequence();
+    }
+
+    private void StartSuccessSequence()
+    {
+        state = State.Transcending;
+
+        audioSource.PlayOneShot(successSound);
+
+        successFX.SetActive(true);
+
+        Invoke("LoadNextLevel", levelLoadDelay);
+    }
+
+    private void StartDeathSequence()
+    {
+        state = State.Dying;
+
+        audioSource.Stop();
+        audioSource.PlayOneShot(deathSound);
+
+        for (int i = 0; i < meshes.Length; i++)
+            meshes[i].enabled = false;
+
+        for (int i = 0; i < colliders.Length; i++)
+            colliders[i].isTrigger = true;
+
+        pointLight.gameObject.SetActive(false);
+        engineFX.gameObject.SetActive(false);
+        deathFX.SetActive(true);
+
+        rigidBody.isKinematic = true;
+
+        Invoke("LoadFirstLevel", levelLoadDelay);
+    }
+
+    private void LoadFirstLevel()
+    {
+        SceneManager.LoadScene(0);
+    }
+
+    private void LoadNextLevel()
+    {
+        int currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
+        int nextSceneIndex = currentSceneIndex + 1;
+        int lastSceneIndex = SceneManager.sceneCountInBuildSettings - 1;
+
+        if (currentSceneIndex < lastSceneIndex)
+            SceneManager.LoadScene(nextSceneIndex);
+
+        else if (currentSceneIndex == lastSceneIndex)
+            LoadFirstLevel();
+    }
+
+    private void ProcessDebugKeys()
+    {
+        if (Input.GetKeyDown(KeyCode.L))
+            LoadNextLevel();
+
+        else if (Input.GetKeyDown(KeyCode.C))
+            collisionsEnabled = !collisionsEnabled;
     }
 }
