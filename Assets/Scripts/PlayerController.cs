@@ -10,17 +10,18 @@ public class PlayerController : MonoBehaviour
     [SerializeField] AudioClip successSound;
     [SerializeField] AudioClip deathSound;
 
-    [SerializeField] ParticleSystem engineFX;
-    [SerializeField] ParticleSystem successFX;
-    [SerializeField] ParticleSystem deathFX;
+    [SerializeField] GameObject engineFX;
+    [SerializeField] GameObject successFX;
+    [SerializeField] GameObject deathFX;
     
-    [SerializeField] float verticalThrust = 100f;
+    [SerializeField] float verticalThrust = 1000f;
     [SerializeField] float horizontalThrust = 100f;
 
     [SerializeField] float levelLoadDelay = 2f;
 
     Rigidbody rigidBody;
     AudioSource audioSource;
+    MeshRenderer[] meshes;
 
     enum State { Alive, Dying, Transcending }
     State state = State.Alive;
@@ -31,9 +32,10 @@ public class PlayerController : MonoBehaviour
     {
         rigidBody = GetComponent<Rigidbody>();
         audioSource = GetComponent<AudioSource>();
+        meshes = GetComponentsInChildren<MeshRenderer>();
 
         successFX.gameObject.SetActive(false);
-        deathFX.gameObject.SetActive(false);
+        deathFX.SetActive(false);
     }
 
     void Update()
@@ -78,7 +80,7 @@ public class PlayerController : MonoBehaviour
     {
         state = State.Transcending;
         audioSource.PlayOneShot(successSound);
-        successFX.gameObject.SetActive(true);
+        successFX.SetActive(true);
         Invoke("LoadNextLevel", levelLoadDelay);
     }
 
@@ -87,7 +89,15 @@ public class PlayerController : MonoBehaviour
         state = State.Dying;
         audioSource.Stop();
         audioSource.PlayOneShot(deathSound);
-        deathFX.gameObject.SetActive(true);
+
+        for (int i = 0; i < meshes.Length; i++)
+        {
+            meshes[i].enabled = false;
+        }
+
+        rigidBody.isKinematic = true;
+        engineFX.gameObject.SetActive(false);
+        deathFX.SetActive(true);
         Invoke("LoadFirstLevel", levelLoadDelay);
     }
 

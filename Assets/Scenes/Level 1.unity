@@ -3447,6 +3447,56 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5488950439773318066, guid: 0eb24b1ada2e8ab4cbd49b7c64672be3,
+        type: 3}
+      propertyPath: m_BoundingSphereOverride.y
+      value: 6e-44
+      objectReference: {fileID: 0}
+    - target: {fileID: 5488950439773318066, guid: 0eb24b1ada2e8ab4cbd49b7c64672be3,
+        type: 3}
+      propertyPath: m_BoundingSphereOverride.w
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5488950439773318066, guid: 0eb24b1ada2e8ab4cbd49b7c64672be3,
+        type: 3}
+      propertyPath: m_BoundingSphereOverride.x
+      value: 4.159e-42
+      objectReference: {fileID: 0}
+    - target: {fileID: 818191980131346710, guid: 0eb24b1ada2e8ab4cbd49b7c64672be3,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -2.31
+      objectReference: {fileID: 0}
+    - target: {fileID: 818191980131346710, guid: 0eb24b1ada2e8ab4cbd49b7c64672be3,
+        type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 818191980116143190, guid: 0eb24b1ada2e8ab4cbd49b7c64672be3,
+        type: 3}
+      propertyPath: RotationModule.x.minMaxState
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 818191980116143190, guid: 0eb24b1ada2e8ab4cbd49b7c64672be3,
+        type: 3}
+      propertyPath: RotationModule.y.minMaxState
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 818191980116143190, guid: 0eb24b1ada2e8ab4cbd49b7c64672be3,
+        type: 3}
+      propertyPath: RotationModule.separateAxes
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 818191980116143190, guid: 0eb24b1ada2e8ab4cbd49b7c64672be3,
+        type: 3}
+      propertyPath: VelocityModule.y.minScalar
+      value: -37.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 818191980116143190, guid: 0eb24b1ada2e8ab4cbd49b7c64672be3,
+        type: 3}
+      propertyPath: VelocityModule.y.scalar
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 0eb24b1ada2e8ab4cbd49b7c64672be3, type: 3}
 --- !u!1001 &8263983394442810194
